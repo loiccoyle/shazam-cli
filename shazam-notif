@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# Small script to run acrcloud-id, with notifications.
+# Requires shazam, jq, notify-send, dunstify(optional).
+
+err_msg_exit() {
+    # Print an error to stderr and exit.
+    printf "%s\n" "$*" >&2
+    exit 1
+}
+
+type shazam >/dev/null || err_msg_exit "'shazam' not found."
+type jq >/dev/null || err_msg_exit "'jq' not found."
+
+COVERT_ART_FILE="/tmp/shazam/coverart.jpg"
+
+# set the source to the monitor of the current output sink
+SOURCE="$(ffmpeg -sinks pulse 2>/dev/null | grep '\*' | cut -d' ' -f2).monitor"
+if ! ffmpeg -sources pulse 2>/dev/null | grep -q "$SOURCE"; then
+    # exit if doesn't exist
+    echo "Source monitor \"$SOURCE\" not found." >&2
+    exit 1
+fi
+
+notify-send -i "audio-input-microphone" -t 5000 "Shazam" "Recording audio for 5s."
+RESPONSE="$(shazam -s "$SOURCE")"
+
+N_MATCHES="$(echo "$RESPONSE" | jq -r '.matches | length')"
+if [ "$N_MATCHES" = 0 ]; then
+    notify-send -i "music" "Shazam" "Failed to identify song."
+    exit 2
+fi
+
+ARTIST="$(echo "$RESPONSE" | jq -r ".track.subtitle")"
+TITLE="$(echo "$RESPONSE" | jq -r ".track.title")"
+COVER_ART_URL="$(echo "$RESPONSE" | jq -r ".track.images.coverart")"
+
+curl --silent "$COVER_ART_URL" -o "$COVERT_ART_FILE"
+
+
+if type dunstify >/dev/null; then
+    case "$(dunstify -i "$COVERT_ART_FILE" \
+        --action="apple music,apple music" \
+        --action="youtube,youtube" \
+        "$ARTIST" "$TITLE")" in
+        "apple music")
+            AM_LINK="$(echo "$RESPONSE" | jq -r ".track.hub.options[0].actions[0].uri")"]
+            xdg-open "$AM_LINK"
+            ;;
+        "youtube")
+            YT_LINK="$(echo "$RESPONSE" | jq -r '.track.sections | map(select(.type == "VIDEO"))[0].youtubeurl.actions[0].uri')"
+            xdg-open "$YT_LINK"
+            ;;
+    esac
+else
+    notify-send -i "$COVERT_ART_FILE" "$ARTIST" "$TITLE"
+fi

@@ -1,0 +1,126 @@
+#!/bin/sh
+
+# Use https://shazam.p.rapidapi.com/ to detect audio currently playing through audio source.
+# Requires curl, ffmpeg
+
+TMP_DIR="/tmp/shazam"
+[ ! -d "$TMP_DIR" ] && mkdir "$TMP_DIR"
+AUDIO_FILE="$TMP_DIR/recording.dat"
+AUDIO_B64_FILE="$TMP_DIR/recording_b64.dat"
+PID_FILE="$TMP_DIR/recordingpid"
+
+API_KEY_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/shazam-cli/key"
+[ -f "$API_KEY_FILE" ] && API_KEY="$(<"$API_KEY_FILE")"
+
+err_msg_exit() {
+    # Print an error to stderr and exit.
+    printf "%s\n" "$*" >&2
+    exit 1
+}
+
+type curl >/dev/null || err_msg_exit "'curl' not found."
+type ffmpeg >/dev/null || err_msg_exit "'ffmpeg' not found."
+
+usage() {
+    printf "Usage: shazam [OPTION]... [FILE]
+Query the Shazam identify music recognition API.
+
+Get free API access at: https://rapidapi.com/apidojo/api/shazam/
+
+The API key can be read from file:
+$ echo \"api-key\" > \"%s\"
+
+If no FILE is provided, a recording is made using the AUDIO_SOURCE.
+
+Usage:
+    -h                    Show this message and exit.
+    -a API_KEY            API token.
+    -s AUDIO_SOURCE       ffmpeg audio input source, (default: \"default\").
+    -t RECORDING_TIME     Length of recording time, in seconds, (default: 5).
+" "$API_KEY_FILE"
+}
+
+start_recording() {
+    # should be mono signed 16 bit little endian
+    ffmpeg \
+        -hide_banner \
+        -f pulse -i "$AUDIO_SOURCE" \
+        -ac 1 -f s16le -acodec pcm_s16le -ar 44100 \
+        -y "$AUDIO_FILE" >/dev/null 2>&1 &
+    printf "%s\n" "$!" >"$PID_FILE"
+}
+
+kill_recording() {
+    # kill with SIGTERM, allowing finishing touches.
+    local pid
+    pid="$(cat "$PID_FILE")"
+    kill "$pid"
+    rm -f "$PID_FILE"
+    # even after SIGTERM, ffmpeg may still run, so wait till it's done.
+    while kill -0 "$pid" 2>/dev/null; do
+        sleep 0.1
+    done
+}
+
+convert() {
+    # convert audio file to 44100 Hz 16 bit signed little endian mono
+    ffmpeg -i "$AUDIO_FILE" -ac 1 -f s16le -acodec pcm_s16le -ar 44100 -y "/tmp/shazam/converted.dat" >/dev/null 2>&1
+    AUDIO_FILE="/tmp/shazam/converted.dat"
+}
+
+record() {
+    start_recording && sleep "$RECORDING_TIME" && kill_recording
+}
+
+query() {
+    base64 $AUDIO_FILE >$AUDIO_B64_FILE
+    curl --silent -X POST \
+        'https://shazam.p.rapidapi.com/songs/v2/detect' \
+        --header 'content-type: text/plain' \
+        --header 'x-rapidapi-host: shazam.p.rapidapi.com' \
+        --header "x-rapidapi-key: $API_KEY" \
+        --data "@$AUDIO_B64_FILE"
+}
+
+# Defaults
+RECORDING_TIME=5 # in seconds
+AUDIO_SOURCE="default"
+
+# Parse options
+while getopts ":ha:s:t:" opt; do
+    case $opt in
+        "h")
+            usage
+            exit 0
+            ;;
+        "a")
+            API_KEY="$OPTARG"
+            ;;
+        "s")
+            AUDIO_SOURCE="$OPTARG"
+            ;;
+        "t")
+            RECORDING_TIME="$OPTARG"
+            ;;
+        "?")
+            usage >&2
+            err_msg_exit "Invalid Option: -$OPTARG"
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+[ -z "$API_KEY" ] && err_msg_exit "shazam: No API_KEY provided. Use the -a option or write it to \"$API_KEY_FILE\""
+
+if [ -z "$1" ]; then
+    record || exit
+else
+    if [ -f "$1" ]; then
+        AUDIO_FILE="$1"
+        convert
+    else
+        err_msg_exit "shazam: File \"$1\" not found."
+    fi
+fi
+
+[ -f "$AUDIO_FILE" ] && query
