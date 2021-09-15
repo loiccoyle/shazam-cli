@@ -37,7 +37,6 @@ COVER_ART_URL="$(echo "$RESPONSE" | jq -r ".track.images.coverart")"
 
 curl --silent "$COVER_ART_URL" -o "$COVERT_ART_FILE"
 
-
 if type dunstify >/dev/null; then
     case "$(dunstify -i "$COVERT_ART_FILE" \
         --action="apple music,apple music" \
