@@ -53,7 +53,7 @@ start_recording() {
 kill_recording() {
     # kill with SIGTERM, allowing finishing touches.
     local pid
-    pid="$(cat "$PID_FILE")"
+    pid="$(<"$PID_FILE")"
     kill "$pid"
     rm -f "$PID_FILE"
     # even after SIGTERM, ffmpeg may still run, so wait till it's done.
