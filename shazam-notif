@@ -42,14 +42,14 @@ if type dunstify >/dev/null; then
         --action="apple music,apple music" \
         --action="youtube,youtube" \
         "$ARTIST" "$TITLE")" in
-        "apple music")
-            AM_LINK="$(echo "$RESPONSE" | jq -r ".track.hub.options[0].actions[0].uri")"]
-            xdg-open "$AM_LINK"
-            ;;
-        "youtube")
-            YT_LINK="$(echo "$RESPONSE" | jq -r '.track.sections | map(select(.type == "VIDEO"))[0].youtubeurl.actions[0].uri')"
-            xdg-open "$YT_LINK"
-            ;;
+    "apple music")
+        AM_LINK="$(echo "$RESPONSE" | jq -r ".track.hub.options[0].actions[0].uri")"]
+        xdg-open "$AM_LINK"
+        ;;
+    "youtube")
+        YT_LINK="$(echo "$RESPONSE" | jq -r '.track.sections | map(select(.type == "VIDEO"))[0].youtubeurl.actions[0].uri')"
+        xdg-open "$YT_LINK"
+        ;;
     esac
 else
     notify-send -i "$COVERT_ART_FILE" "$ARTIST" "$TITLE"
