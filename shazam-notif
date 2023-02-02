@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Small script to run shazam, with notifications.
 # Requires shazam, jq, notify-send, dunstify(optional).
