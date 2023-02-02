@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Use https://shazam.p.rapidapi.com/ to detect audio currently playing through audio source.
+# Use https://rapidapi.com/apidojo/api/shazam/ to detect audio currently playing through audio source.
 # Requires curl, ffmpeg
 
 TMP_DIR="/tmp/shazam"
@@ -89,23 +89,23 @@ AUDIO_SOURCE="default"
 # Parse options
 while getopts ":ha:s:t:" opt; do
     case $opt in
-        "h")
-            usage
-            exit 0
-            ;;
-        "a")
-            API_KEY="$OPTARG"
-            ;;
-        "s")
-            AUDIO_SOURCE="$OPTARG"
-            ;;
-        "t")
-            RECORDING_TIME="$OPTARG"
-            ;;
-        "?")
-            usage >&2
-            err_msg_exit "Invalid Option: -$OPTARG"
-            ;;
+    "h")
+        usage
+        exit 0
+        ;;
+    "a")
+        API_KEY="$OPTARG"
+        ;;
+    "s")
+        AUDIO_SOURCE="$OPTARG"
+        ;;
+    "t")
+        RECORDING_TIME="$OPTARG"
+        ;;
+    "?")
+        usage >&2
+        err_msg_exit "Invalid Option: -$OPTARG"
+        ;;
     esac
 done
 shift $((OPTIND - 1))
