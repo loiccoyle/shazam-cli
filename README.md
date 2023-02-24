@@ -1,4 +1,4 @@
-# shazam-cli
+# 🎶 shazam-cli
 
 <p align="center">
   <a href="./LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
@@ -9,7 +9,9 @@ Record audio and use the [Shazam](https://rapidapi.com/apidojo/api/shazam/) musi
 
 The [`shazam`](./shazam) scripts queries the Shazam API. This repository also contains [`shazam-notif`](./shazam-notif) which uses [`shazam`](./shazam) and `libnotify` to return the match result.
 
-## Dependencies:
+## 📦 Installation
+
+### Dependencies:
 
 The `shazam` script requires:
 
@@ -21,8 +23,6 @@ In addition to the above the `shazam-notif` script requires:
 - [jq](https://github.com/stedolan/jq)
 - notify-send
 - [dunst](https://github.com/dunst-project/dunst) (optional)
-
-## Installation
 
 #### Manual
 
@@ -36,11 +36,13 @@ Using your favourite AUR helper:
 $ paru -S shazam-cli-git
 ```
 
-## Usage
+## 📋 Usage
 
 To use these scripts you'll need your own API key.
-It can be obtained from https://rapidapi.com/apidojo/api/shazam/ you'll need a RapidAPI account and subscribe to the Shazam API (there is a free a plan).
+It can be obtained from [`rapidapi`](https://rapidapi.com/apidojo/api/shazam/) you'll need a RapidAPI account and subscribe to the Shazam API (there is a free a plan).
 Provide the API key either through the `-a` flag or by writing to `${XDG_CONFIG_HOME:-$HOME/.config}/shazam-cli/key`.
+
+<!-- help start -->
 
 ```
 $ shazam -h
@@ -61,4 +63,6 @@ Usage:
     -t RECORDING_TIME     Length of recording time, in seconds, (default: 5).
 ```
 
-You can use `ffmpeg -sources pulse` to list available sources.
+<!-- help end -->
+
+> You can use `ffmpeg -sources pulse` to list available sources.
