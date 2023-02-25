@@ -52,7 +52,7 @@ Query the Shazam identify music recognition API.
 Get free API access at: https://rapidapi.com/apidojo/api/shazam/
 
 The API key can be read from file:
-$ echo "api-key" > "/home/runner/.config/shazam-cli/key"
+$ echo "api-key" > "~/.config/shazam-cli/key"
 
 If no FILE is provided, a recording is made using the AUDIO_SOURCE.
 
