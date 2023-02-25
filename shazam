@@ -18,9 +18,6 @@ err_msg_exit() {
     exit 1
 }
 
-type curl >/dev/null || err_msg_exit "'curl' not found."
-type ffmpeg >/dev/null || err_msg_exit "'ffmpeg' not found."
-
 usage() {
     printf "Usage: shazam [OPTION]... [FILE]
 Query the Shazam identify music recognition API.
@@ -109,6 +106,9 @@ while getopts ":ha:s:t:" opt; do
     esac
 done
 shift $((OPTIND - 1))
+
+type curl >/dev/null || err_msg_exit "'curl' not found."
+type ffmpeg >/dev/null || err_msg_exit "'ffmpeg' not found."
 
 [ -z "$API_KEY" ] && err_msg_exit "shazam: No API_KEY provided. Use the -a option or write it to \"$API_KEY_FILE\""
 
