@@ -46,21 +46,6 @@ Provide the API key either through the `-a` flag or by writing to `${XDG_CONFIG_
 
 ```
 $ shazam -h
-Usage: shazam [OPTION]... [FILE]
-Query the Shazam identify music recognition API.
-
-Get free API access at: https://rapidapi.com/apidojo/api/shazam/
-
-The API key can be read from file:
-$ echo "api-key" > "~/.config/shazam-cli/key"
-
-If no FILE is provided, a recording is made using the AUDIO_SOURCE.
-
-Usage:
-    -h                    Show this message and exit.
-    -a API_KEY            API token.
-    -s AUDIO_SOURCE       ffmpeg audio input source, (default: "default").
-    -t RECORDING_TIME     Length of recording time, in seconds, (default: 5).
 ```
 
 <!-- help end -->
