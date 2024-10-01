@@ -47,7 +47,7 @@ Provide the API key either through the `-a` flag or by writing to `${XDG_CONFIG_
 ```
 $ shazam -h
 Usage: shazam [OPTION]... [FILE]
-Query the Shazam identify music recognition API.
+Query the Shazam music recognition API.
 
 Get free API access at: https://rapidapi.com/apidojo/api/shazam/
 
