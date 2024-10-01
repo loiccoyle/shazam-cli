@@ -11,7 +11,7 @@ The [`shazam`](./shazam) scripts queries the Shazam API. This repository also co
 
 ## 📦 Installation
 
-### Dependencies:
+### Dependencies
 
 The `shazam` script requires:
 
@@ -28,12 +28,12 @@ In addition to the above the `shazam-notif` script requires:
 
 Just clone this repo and place the `shazam` and `shazam-notif` scripts on your `$PATH`.
 
-#### Arch (AUR):
+#### Arch (AUR)
 
 Using your favourite AUR helper:
 
 ```sh
-$ paru -S shazam-cli-git
+paru -S shazam-cli-git
 ```
 
 ## 📋 Usage
