@@ -14,7 +14,7 @@ err_msg_exit() {
 type shazam >/dev/null || err_msg_exit "'shazam' not found."
 type jq >/dev/null || err_msg_exit "'jq' not found."
 
-COVERT_ART_FILE="/tmp/shazam/coverart.jpg"
+COVER_ART_FILE="/tmp/shazam/coverart.jpg"
 
 # set the source to the monitor of the current output sink
 SOURCE="$(ffmpeg -sinks pulse 2>/dev/null | grep '\*' | cut -d' ' -f2).monitor"
@@ -37,10 +37,10 @@ ARTIST="$(echo "$RESPONSE" | jq -r ".track.subtitle")"
 TITLE="$(echo "$RESPONSE" | jq -r ".track.title")"
 COVER_ART_URL="$(echo "$RESPONSE" | jq -r ".track.images.coverart")"
 
-curl --silent "$COVER_ART_URL" -o "$COVERT_ART_FILE"
+curl --silent "$COVER_ART_URL" -o "$COVER_ART_FILE"
 
 if type dunstify >/dev/null; then
-    case "$(dunstify -i "$COVERT_ART_FILE" \
+    case "$(dunstify -i "$COVER_ART_FILE" \
         --action="apple music,apple music" \
         --action="youtube,youtube" \
         "$ARTIST" "$TITLE")" in
@@ -54,5 +54,5 @@ if type dunstify >/dev/null; then
         ;;
     esac
 else
-    notify-send -i "$COVERT_ART_FILE" "$ARTIST" "$TITLE"
+    notify-send -i "$COVER_ART_FILE" "$ARTIST" "$TITLE"
 fi
